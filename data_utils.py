@@ -1,6 +1,4 @@
 import os
-# import wget
-# import tarfile
 import re
 from nltk.tokenize import word_tokenize
 import collections
@@ -69,10 +67,3 @@ def batch_iter(inputs, outputs, batch_size, num_epochs):
             start_index = batch_num * batch_size
             end_index = min((batch_num + 1) * batch_size, len(inputs))
             yield inputs[start_index:end_index], outputs[start_index:end_index]
-
-
-# if __name__ == "__main__":
-#     MAX_DOCUMENT_LEN = 100
-#     word_dict = build_word_dict()
-#     train_x, train_y = build_word_dataset("train", word_dict, MAX_DOCUMENT_LEN)
-#     print("END")

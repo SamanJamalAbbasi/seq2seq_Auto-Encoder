@@ -1,6 +1,5 @@
 import tensorflow as tf
 from pre_train import train
-import argparse
 from data_utils import build_word_dict, build_word_dataset
 import pickle
 from sklearn.metrics.pairwise import cosine_similarity
@@ -12,18 +11,17 @@ file_dir = "data/wikismall-complex.txt"
 data = open(file_dir, encoding='utf-8', errors='ignore').read().split('\n')
 
 # Training all data and convert it to new Embedded representation :
-parser = argparse.ArgumentParser()
-parser.add_argument("--model", type=str, default="auto_encoder", help="auto_encoder")
-args = parser.parse_args()
 print("\nBuilding dictionary..")
 word_dict = build_word_dict()
 print("Preprocessing dataset..")
 train_x, train_y = build_word_dataset(word_dict, MAX_DOCUMENT_LEN)
-embedded_data = train(train_x, train_y, word_dict, args)
+embedded_data = train(train_x, train_y, word_dict)
 # Test : Convert Question to embedded representation base on previous Trained model weights.
 print(" Question: ")
 tf.reset_default_graph()
-query1 = "His Seven Stars Symphony features movements inspired by Douglas Fairbanks , Lilian Harvey , Greta Garbo , Clara Bow , Marlene Dietrich , Emil Jannings and Charlie Chaplin in some of their most famous film roles ."
+query1 = "His Seven Stars Symphony features movements inspired by Douglas Fairbanks , Lilian Harvey ," \
+         " Greta Garbo , Clara Bow , Marlene Dietrich , Emil Jannings and Charlie Chaplin in some of " \
+         "their most famous film roles ."
 with open("word_dict.pickle", "rb") as f:
     word_dict = pickle.load(f)
 
@@ -49,9 +47,8 @@ def similarity(x, q):
 question = sum_embedded_words(embed_question[:1])
 question = np.reshape(question, [1, 512])
 score = similarity(embedded_data, question)
-max_similar = score.index(max(score))
-most_similar_answer = data[max_similar]
+max_similarity = score.index(max(score))
+most_similar_answer = data[max_similarity]
 print(max(score))
-print(max_similar)
+print(max_similarity)
 print(most_similar_answer)
-print()

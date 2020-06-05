@@ -1,10 +1,7 @@
 import tensorflow as tf
-import pickle
 import numpy as np
-from nltk.tokenize import word_tokenize
 from model.auto_encoder import AutoEncoder
-import re
-# from data_utils import build_word_dict, build_word_dataset, batch_iter
+
 BATCH_SIZE = 64
 
 

@@ -1,15 +1,13 @@
 import tensorflow as tf
-import argparse
-# import os
 from model.auto_encoder import AutoEncoder
-from data_utils import build_word_dict, build_word_dataset, batch_iter
+from data_utils import batch_iter
 
 BATCH_SIZE = 64
 NUM_EPOCHS = 100
 MAX_DOCUMENT_LEN = 50
 
 
-def train(train_x, train_y, word_dict, args):
+def train(train_x, train_y, word_dict):
     with tf.Session() as sess:
         model = AutoEncoder(word_dict, MAX_DOCUMENT_LEN)
         # Define training procedure
@@ -21,9 +19,9 @@ def train(train_x, train_y, word_dict, args):
         train_op = optimizer.apply_gradients(zip(clipped_gradients, params), global_step=global_step)
 
         # Summary
-        loss_summary = tf.summary.scalar("loss", model.loss)
+        tf.summary.scalar("loss", model.loss)
         summary_op = tf.summary.merge_all()
-        summary_writer = tf.summary.FileWriter(args.model, sess.graph)
+        summary_writer = tf.summary.FileWriter("auto_encoder", sess.graph)
 
         # Checkpoint
         saver = tf.train.Saver(tf.global_variables())
@@ -38,7 +36,6 @@ def train(train_x, train_y, word_dict, args):
                                                                                   model.encoder_outputs],
                                                                                  feed_dict=feed_dict)
             summary_writer.add_summary(summaries, step)
-        ##################
         outputs = []
 
         def eval(batch_x):
@@ -65,15 +62,3 @@ def train(train_x, train_y, word_dict, args):
             return sent_embedded
         embedded_input = sum_embedded_words(outputs)
     return embedded_input
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--model", type=str, default="auto_encoder", help="auto_encoder")
-    args = parser.parse_args()
-    print("\nBuilding dictionary..")
-    word_dict = build_word_dict()
-    print("Preprocessing dataset..")
-    train_x, train_y = build_word_dataset(word_dict, MAX_DOCUMENT_LEN)
-    all_data = train(train_x, train_y, word_dict, args)
-    print("END")
